@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca de Projetos — Curso Técnico</title>
+  <link rel="stylesheet" href="Style.css?v=2">
+</head>
+<body>
+
+  <!-- ===== CABEÇALHO ===== -->
+  <header class="site-header">
+    <p class="eyebrow">Curso Técnico — Desenvolvimento de Sistemas &amp; Administração</p>
+    <h1 class="site-title">Biblioteca de Projetos</h1>
+    <p class="site-sub">Projetos criados pelos grupos das turmas, com fotos, vídeos e descrição.</p>
+
+    <div class="stats">
+      <span><strong id="statTotal">0</strong> projetos</span>
+      <span><strong id="statTurmas">0</strong> turmas</span>
+    </div>
+
+    <button id="btnAdicionar" class="btn-primary" type="button">+ Adicionar Projeto</button>
+  </header>
+
+  <!-- ===== FILTROS E BUSCA ===== -->
+  <section class="controls">
+    <input type="text" id="searchInput" placeholder="Buscar por nome, integrante ou palavra-chave...">
+
+    <select id="turmaFilter">
+      <option value="todas">Todas as turmas</option>
+      <!-- opções de turma inseridas via JS -->
+    </select>
+
+    <div id="techFilters">
+      <!-- chips de tecnologia inseridos via JS -->
+    </div>
+
+    <label>
+      <input type="checkbox" id="featuredOnly">
+      Somente destaques
+    </label>
+  </section>
+
+  <!-- ===== GRID DE PROJETOS ===== -->
+  <main id="catalog">
+    <!-- cards inseridos via JS -->
+  </main>
+
+  <p id="emptyState" hidden>Nenhum projeto encontrado. Clique em "+ Adicionar Projeto" para cadastrar o primeiro.</p>
+
+  <!-- ===== MODAL DE DETALHE (visualizar projeto) ===== -->
+  <div id="modalBackdrop">
+    <div id="modalCard" role="dialog" aria-modal="true">
+      <button id="modalClose" class="modal-close-btn" aria-label="Fechar">✕</button>
+      <div id="modalContent">
+        <!-- conteúdo do projeto clicado, inserido via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DE FORMULÁRIO (adicionar projeto) ===== -->
+  <div id="formBackdrop">
+    <div id="formCard" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+      <button id="formClose" class="modal-close-btn" aria-label="Fechar">✕</button>
+      <h2 id="formTitle">Adicionar Projeto</h2>
+
+      <form id="projetoForm">
+
+        <label class="form-label" for="fTurma">Turma *</label>
+        <select id="fTurma" required>
+          <option value="" disabled selected>Selecione a turma</option>
+          <!-- opções inseridas via JS -->
+        </select>
+
+        <label class="form-label" for="fIntegrantes">Integrantes do grupo *</label>
+        <input type="text" id="fIntegrantes" placeholder="Nome 1, Nome 2, Nome 3..." required>
+
+        <label class="form-label" for="fSala">Sala de exposição</label>
+        <input type="text" id="fSala" placeholder="Ex: Sala 12, Laboratório 2...">
+
+        <label class="form-label" for="fNome">Nome do projeto *</label>
+        <input type="text" id="fNome" placeholder="Ex: Sistema de Controle de Estoque" required>
+
+        <label class="form-label">Imagens do projeto <span class="form-hint">(máx. 8)</span></label>
+        <input type="file" id="fImagens" accept="image/*" multiple>
+        <div id="previewImagens" class="preview-row"></div>
+
+        <div id="blocoVideos" hidden>
+          <label class="form-label">Vídeos do projeto <span class="form-hint">(máx. 5, até 3 minutos cada)</span></label>
+          <div class="video-add-row">
+            <input type="text" id="fVideoLink" placeholder="Cole um link do YouTube...">
+            <button type="button" id="btnAddVideoLink" class="btn-secondary btn-small">Adicionar link</button>
+          </div>
+          <div class="video-add-row">
+            <input type="file" id="fVideoArquivo" accept="video/*">
+            <button type="button" id="btnAddVideoArquivo" class="btn-secondary btn-small">Adicionar arquivo</button>
+          </div>
+          <p id="videoAvisoErro" class="form-erro" hidden></p>
+          <div id="listaVideos" class="video-list"></div>
+        </div>
+
+        <label class="form-label" for="fDescricao">Descrição do projeto *</label>
+        <textarea id="fDescricao" rows="5" placeholder="Explique o que o projeto faz, como foi feito, tecnologias usadas, etc." required></textarea>
+
+        <label class="form-label" for="fTecnologias">Tecnologias usadas</label>
+        <input type="text" id="fTecnologias" placeholder="Ex: Python, Pygame (separe por vírgula)">
+
+        <label class="form-label" for="fRepo">Link do Projeto (opcional)</label>
+        <input type="text" id="fRepo" placeholder="https://github.com/...">
+
+        <label class="form-checkbox">
+          <input type="checkbox" id="fDestaque">
+          Marcar como projeto em destaque
+        </label>
+
+        <div class="form-actions">
+          <button type="button" id="formCancelar" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar Projeto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
