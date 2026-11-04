@@ -33,7 +33,7 @@
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M3 5a2 2 0 0 1 2-2h4.2l2 2.5H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         Projetos
       </a>
-      <a href="#sobre" class="nav-link" data-target="sobre">
+      <a href="#" class="nav-link" id="btnSobre" role="button">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5" stroke-linecap="round"/></svg>
         Sobre
       </a>
@@ -195,6 +195,38 @@
 
   <p id="emptyState" hidden>Nenhum projeto encontrado. Clique em "+ Adicionar Projeto" para cadastrar o primeiro.</p>
 
+  <!-- ===== MODAL SOBRE ===== -->
+  <div id="sobreBackdrop">
+    <div id="sobreCard" role="dialog" aria-modal="true" aria-labelledby="sobreTitulo">
+      <button id="sobreClose" class="modal-close-btn" aria-label="Fechar">✕</button>
+      <span class="modal-meta">Sobre o site</span>
+      <h2 id="sobreTitulo" class="modal-title">Para que serve a Biblioteca de Projetos?</h2>
+      <p class="sobre-texto">
+        A <strong>Biblioteca de Projetos</strong> é a vitrine online dos trabalhos criados pelos alunos do
+        curso técnico em <strong>Desenvolvimento de Sistemas</strong> e <strong>Administração</strong>.
+        Ela reúne, em um só lugar, os projetos desenvolvidos pelos grupos de cada turma.
+      </p>
+      <div class="sobre-grid">
+        <div class="sobre-item">
+          <h3>Mostrar o trabalho dos alunos</h3>
+          <p>Cada projeto tem fotos, vídeos, descrição, tecnologias usadas e os integrantes do grupo.</p>
+        </div>
+        <div class="sobre-item">
+          <h3>Facilitar a consulta</h3>
+          <p>Busque por nome, integrante ou palavra-chave e filtre por turma, tecnologia ou projetos em destaque.</p>
+        </div>
+        <div class="sobre-item">
+          <h3>Guardar a história da turma</h3>
+          <p>Os projetos ficam registrados para que colegas, professores e visitantes possam conhecer e se inspirar.</p>
+        </div>
+        <div class="sobre-item">
+          <h3>Cadastrar novos projetos</h3>
+          <p>Com o botão “+ Adicionar Projeto”, o grupo envia seu trabalho e ele aparece na biblioteca.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== MODAL DE DETALHE (visualizar projeto) ===== -->
   <div id="modalBackdrop">
     <div id="modalCard" role="dialog" aria-modal="true">
@@ -269,7 +301,7 @@
   </div>
 
   <!-- ===== RODAPÉ ===== -->
-  <footer class="site-footer" id="sobre">
+  <footer class="site-footer">
     <div class="footer-brand">
       <svg class="brand-icon" viewBox="0 0 48 40" aria-hidden="true">
         <path d="M24 3 2 14l22 11 22-11z" fill="url(#gCap)"/>

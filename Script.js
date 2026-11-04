@@ -822,9 +822,21 @@ async function salvarProjeto(e) {
 // ---------- start ----------
 init();
 // ---------- menu: destaca o link clicado ----------
-document.querySelectorAll(".nav-link").forEach(link => {
+document.querySelectorAll(".nav-link:not(#btnSobre)").forEach(link => {
   link.addEventListener("click", () => {
     document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
     link.classList.add("active");
   });
 });
+
+// ---------- modal "Sobre" ----------
+const sobreBackdrop = document.getElementById("sobreBackdrop");
+const btnSobre      = document.getElementById("btnSobre");
+
+function abrirSobre()  { sobreBackdrop.classList.add("open"); }
+function fecharSobre() { sobreBackdrop.classList.remove("open"); }
+
+btnSobre.addEventListener("click", (e) => { e.preventDefault(); abrirSobre(); });
+document.getElementById("sobreClose").addEventListener("click", fecharSobre);
+sobreBackdrop.addEventListener("click", (e) => { if (e.target === sobreBackdrop) fecharSobre(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharSobre(); });
