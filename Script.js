@@ -132,6 +132,12 @@ function registrarEventos() {
     renderizarCatalogo();
   });
 
+  techFiltersEl.addEventListener("change", (e) => {
+    state.techsAtivas.clear();
+    if (e.target.value !== "todas") state.techsAtivas.add(e.target.value);
+    renderizarCatalogo();
+  });
+
   featuredOnly.addEventListener("change", (e) => {
     state.somenteDestaque = e.target.checked;
     renderizarCatalogo();
@@ -226,6 +232,8 @@ function preencherEstatisticas() {
   statTotal.textContent = listaProjetos.length;
   const turmasComProjeto = new Set(listaProjetos.map(p => p.turma));
   statTurmas.textContent = turmasComProjeto.size;
+  document.getElementById("statTotalLabel").textContent = listaProjetos.length === 1 ? "projeto" : "projetos";
+  document.getElementById("statTurmasLabel").textContent = turmasComProjeto.size === 1 ? "turma" : "turmas";
 }
 
 // ---------- select de turmas (filtro) ----------
@@ -248,30 +256,21 @@ function preencherSelectTurmasForm() {
   });
 }
 
-// ---------- chips de tecnologia (filtro) ----------
+// ---------- select de tecnologia (filtro) ----------
 function preencherFiltroTechs() {
-  techFiltersEl.innerHTML = "";
+  techFiltersEl.innerHTML = `<option value="todas">Todas as tecnologias</option>`;
   const todasTechs = new Set();
   listaProjetos.forEach(p => (p.tecnologias || []).forEach(t => todasTechs.add(t)));
 
   [...todasTechs].sort().forEach(tech => {
-    const chip = document.createElement("button");
-    chip.className = "tech-chip";
-    chip.type = "button";
-    chip.textContent = tech;
-    if (state.techsAtivas.has(tech)) chip.classList.add("active");
-    chip.addEventListener("click", () => {
-      if (state.techsAtivas.has(tech)) {
-        state.techsAtivas.delete(tech);
-        chip.classList.remove("active");
-      } else {
-        state.techsAtivas.add(tech);
-        chip.classList.add("active");
-      }
-      renderizarCatalogo();
-    });
-    techFiltersEl.appendChild(chip);
+    const opt = document.createElement("option");
+    opt.value = tech;
+    opt.textContent = tech;
+    techFiltersEl.appendChild(opt);
   });
+
+  const ativa = [...state.techsAtivas][0];
+  techFiltersEl.value = ativa && todasTechs.has(ativa) ? ativa : "todas";
 }
 
 // ---------- filtragem ----------
@@ -302,19 +301,23 @@ function renderizarCatalogo() {
       ? `<img src="${p.fotos[0]}" alt="Capa do projeto ${p.titulo}" loading="lazy">`
       : `<span>sem imagem de capa</span>`;
 
+    const iconeStar = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>`;
+    const iconePessoas = `<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 19c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5z"/><path d="M15.8 13.8c3.2-.4 5.7 1.4 5.7 4.2h-4.2c0-1.7-.6-3.1-1.5-4.2z"/></svg>`;
+
     card.innerHTML = `
       <div class="card-cover">
         ${capa}
-        ${p.destaque ? '<span class="badge-destaque">Destaque</span>' : ''}
+        <span class="card-turma">${p.turma}</span>
+        ${p.destaque ? `<span class="badge-destaque">${iconeStar} Destaque</span>` : ''}
       </div>
       <div class="card-body">
-        <div class="card-top-meta">
-          <span class="card-turma">${p.turma}</span>
-          ${p.sala ? `<span class="card-sala">📍 ${p.sala}</span>` : ""}
-        </div>
-        <span class="card-integrantes">${(p.integrantes || []).join(", ")}</span>
         <h3 class="card-title">${p.titulo}</h3>
         <p class="card-desc">${p.descricaoCurta || ""}</p>
+        <div class="card-integrantes">
+          <span class="card-integrantes-label">${iconePessoas} Desenvolvido por</span>
+          <div class="card-nomes">${(p.integrantes || []).map(n => `<span>${n}</span>`).join("")}</div>
+        </div>
+        ${p.sala ? `<span class="card-sala">📍 ${p.sala}</span>` : ""}
         <div class="card-tags">
           ${(p.tecnologias || []).map(t => `<span>${t}</span>`).join("")}
         </div>
@@ -352,8 +355,12 @@ function abrirModal(p) {
     : `<span class="modal-no-repo">Repositório ainda não disponível</span>`;
 
   modalContent.innerHTML = `
-    <span class="modal-meta">${p.turma}${p.sala ? ` · 📍 ${p.sala}` : ""} · ${(p.integrantes || []).join(", ")}</span>
+    <span class="modal-meta">${p.turma}${p.sala ? ` · 📍 ${p.sala}` : ""}</span>
     <h2 class="modal-title">${p.titulo}</h2>
+    <div class="modal-integrantes">
+      <span class="modal-integrantes-label">Integrantes</span>
+      <div class="card-nomes">${(p.integrantes || []).map(n => `<span>${n}</span>`).join("")}</div>
+    </div>
     ${carouselHTML}
     <p class="modal-desc">${p.descricao || p.descricaoCurta || ""}</p>
     <div class="modal-tags">
@@ -814,3 +821,10 @@ async function salvarProjeto(e) {
 
 // ---------- start ----------
 init();
+// ---------- menu: destaca o link clicado ----------
+document.querySelectorAll(".nav-link").forEach(link => {
+  link.addEventListener("click", () => {
+    document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+    link.classList.add("active");
+  });
+});
