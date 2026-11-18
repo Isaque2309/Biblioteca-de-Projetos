@@ -57,7 +57,6 @@ const emptyStateEl   = document.getElementById("emptyState");
 const searchInput    = document.getElementById("searchInput");
 const turmaFilter    = document.getElementById("turmaFilter");
 const techFiltersEl  = document.getElementById("techFilters");
-const featuredOnly   = document.getElementById("featuredOnly");
 const statTotal      = document.getElementById("statTotal");
 const statTurmas     = document.getElementById("statTurmas");
 
@@ -119,11 +118,6 @@ function registrarEventos() {
   techFiltersEl.addEventListener("change", (e) => {
     state.techsAtivas.clear();
     if (e.target.value !== "todas") state.techsAtivas.add(e.target.value);
-    renderizarCatalogo();
-  });
-
-  featuredOnly.addEventListener("change", (e) => {
-    state.somenteDestaque = e.target.checked;
     renderizarCatalogo();
   });
 
