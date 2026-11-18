@@ -90,7 +90,6 @@ const listaVideosEl  = document.getElementById("listaVideos");
 const fDescricao     = document.getElementById("fDescricao");
 const fTecnologias   = document.getElementById("fTecnologias");
 const fRepo          = document.getElementById("fRepo");
-const fDestaque      = document.getElementById("fDestaque");
 const erroSalvar     = document.getElementById("erroSalvar");
 const blocoPin       = document.getElementById("blocoPin");
 const fPin           = document.getElementById("fPin");
@@ -491,7 +490,6 @@ function abrirFormulario(projetoParaEditar = null) {
     fDescricao.value = projetoParaEditar.descricao || "";
     fTecnologias.value = (projetoParaEditar.tecnologias || []).join(", ");
     fRepo.value = projetoParaEditar.repoLink || "";
-    fDestaque.checked = !!projetoParaEditar.destaque;
     blocoPin.hidden = true;
     fPin.required = false;
     fPinConfirmacao.required = false;
@@ -785,7 +783,7 @@ async function salvarProjeto(e) {
       fotos: fotosFinal,
       videos: videosFinal,
       repoLink: fRepo.value.trim(),
-      destaque: fDestaque.checked,
+      destaque: projetoAntigo ? projetoAntigo.destaque : false,
       pinHash: pinHashFinal,
     };
 

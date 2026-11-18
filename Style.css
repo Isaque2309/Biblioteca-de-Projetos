@@ -854,6 +854,7 @@ body::after {
 }
 
 #projetoForm input[type="text"],
+#projetoForm input[type="password"],
 #projetoForm select,
 #projetoForm textarea,
 #projetoForm input[type="file"] {
@@ -869,7 +870,11 @@ body::after {
 
 #projetoForm textarea { resize: vertical; }
 
+#projetoForm input[type="password"] { font-size: 16px; letter-spacing: 2px; }
+#projetoForm input[type="password"]::placeholder { letter-spacing: normal; font-size: 14px; }
+
 #projetoForm input[type="text"]::placeholder,
+#projetoForm input[type="password"]::placeholder,
 #projetoForm textarea::placeholder { color: var(--ink-soft); }
 
 #projetoForm input:focus,
