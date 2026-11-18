@@ -267,6 +267,9 @@
         <label class="form-label" for="fIntegrantes">Integrantes do grupo *</label>
         <input type="text" id="fIntegrantes" placeholder="Nome 1, Nome 2, Nome 3..." required>
 
+        <label class="form-label" for="fSala">Sala (opcional)</label>
+        <input type="text" id="fSala" placeholder="Ex: Laboratório 3">
+
         <label class="form-label" for="fNome">Nome do projeto *</label>
         <input type="text" id="fNome" placeholder="Ex: Sistema de Controle de Estoque" required>
 
@@ -297,11 +300,20 @@
         <label class="form-label" for="fRepo">Link do Projeto (opcional)</label>
         <input type="text" id="fRepo" placeholder="https://github.com/...">
 
+        <div id="blocoPin">
+          <label class="form-label" for="fPin">PIN do projeto *</label>
+          <input type="password" id="fPin" inputmode="numeric" autocomplete="new-password" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="6 dígitos numéricos">
+          <label class="form-label" for="fPinConfirmacao">Confirme o PIN *</label>
+          <input type="password" id="fPinConfirmacao" inputmode="numeric" autocomplete="new-password" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="Digite o PIN novamente">
+          <p class="form-hint">Use esse PIN para editar ou excluir o projeto depois.</p>
+        </div>
+
         <label class="form-checkbox">
           <input type="checkbox" id="fDestaque">
           Marcar como projeto em destaque
         </label>
 
+        <p id="erroSalvar" class="form-erro" role="alert" hidden></p>
         <div class="form-actions">
           <button type="button" id="formCancelar" class="btn-secondary">Cancelar</button>
           <button type="submit" class="btn-primary">Salvar Projeto</button>

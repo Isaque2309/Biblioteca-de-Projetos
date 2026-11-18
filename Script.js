@@ -16,25 +16,6 @@ async function hashPin(pin) {
   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-// pede pro usuário criar um PIN de 6 dígitos (usado ao cadastrar um projeto novo)
-async function pedirCriacaoPin() {
-  while (true) {
-    const pin = prompt("Crie um PIN de 6 dígitos pra proteger este projeto (só quem souber esse PIN vai poder editar/excluir depois):");
-    if (pin === null) return null;
-    if (!/^\d{6}$/.test(pin)) {
-      alert("O PIN precisa ter exatamente 6 dígitos numéricos.");
-      continue;
-    }
-    const confirmacao = prompt("Confirme o PIN:");
-    if (confirmacao === null) return null;
-    if (pin !== confirmacao) {
-      alert("Os PINs não coincidem. Tente de novo.");
-      continue;
-    }
-    return await hashPin(pin);
-  }
-}
-
 // pede o PIN pra confirmar uma ação (editar/excluir); aceita o PIN do projeto OU o PIN de admin
 async function pedirVerificacaoPin(pinHashArmazenado, acao) {
   const pin = prompt(`Digite o PIN deste projeto pra ${acao} (ou o PIN de administrador):`);
@@ -110,6 +91,10 @@ const fDescricao     = document.getElementById("fDescricao");
 const fTecnologias   = document.getElementById("fTecnologias");
 const fRepo          = document.getElementById("fRepo");
 const fDestaque      = document.getElementById("fDestaque");
+const erroSalvar     = document.getElementById("erroSalvar");
+const blocoPin       = document.getElementById("blocoPin");
+const fPin           = document.getElementById("fPin");
+const fPinConfirmacao = document.getElementById("fPinConfirmacao");
 const btnSalvarProjeto = projetoForm.querySelector('button[type="submit"]');
 
 // ============================================
@@ -507,6 +492,9 @@ function abrirFormulario(projetoParaEditar = null) {
     fTecnologias.value = (projetoParaEditar.tecnologias || []).join(", ");
     fRepo.value = projetoParaEditar.repoLink || "";
     fDestaque.checked = !!projetoParaEditar.destaque;
+    blocoPin.hidden = true;
+    fPin.required = false;
+    fPinConfirmacao.required = false;
 
     imagensSelecionadas = (projetoParaEditar.fotos || []).map(url => ({ tipo: "existente", url }));
     videosSelecionados = (projetoParaEditar.videos || []).map(v =>
@@ -521,6 +509,9 @@ function abrirFormulario(projetoParaEditar = null) {
     edicaoId = null;
     formTitle.textContent = "Adicionar Projeto";
     btnSalvarProjeto.textContent = "Salvar Projeto";
+    blocoPin.hidden = false;
+    fPin.required = true;
+    fPinConfirmacao.required = true;
   }
 
   formBackdrop.classList.add("open");
@@ -542,6 +533,8 @@ function resetarEstadoFormulario() {
   previewImagens.innerHTML = "";
   listaVideosEl.innerHTML = "";
   esconderErroVideo();
+  erroSalvar.hidden = true;
+  erroSalvar.textContent = "";
 }
 
 function mostrarErroVideo(msg) {
@@ -717,15 +710,34 @@ async function subirArquivo(file) {
 // ---------- salvar (criar novo OU atualizar existente) ----------
 async function salvarProjeto(e) {
   e.preventDefault();
+  erroSalvar.hidden = true;
+  erroSalvar.textContent = "";
 
   let pinHashFinal;
   if (edicaoId) {
     const projetoAntigo = listaProjetos.find(p => p.id === edicaoId);
     pinHashFinal = projetoAntigo ? projetoAntigo.pinHash : null;
   } else {
-    const hash = await pedirCriacaoPin();
-    if (!hash) return; // cancelou a criação do PIN, não salva o projeto
-    pinHashFinal = hash;
+    const pin = fPin.value.trim();
+    const confirmacao = fPinConfirmacao.value.trim();
+    if (!/^\d{6}$/.test(pin)) {
+      alert("O PIN precisa ter exatamente 6 dígitos numéricos.");
+      fPin.focus();
+      return;
+    }
+    if (pin !== confirmacao) {
+      alert("Os PINs não coincidem. Confira os campos e tente novamente.");
+      fPinConfirmacao.focus();
+      return;
+    }
+    try {
+      pinHashFinal = await hashPin(pin);
+    } catch (erro) {
+      console.error("Erro ao proteger o PIN:", erro);
+      erroSalvar.textContent = "Não foi possível proteger o PIN neste navegador. Abra o site pelo endereço HTTPS e tente novamente.";
+      erroSalvar.hidden = false;
+      return;
+    }
   }
 
   btnSalvarProjeto.disabled = true;
@@ -780,8 +792,14 @@ async function salvarProjeto(e) {
     const linha = projetoParaLinha(dadosProjeto);
 
     if (edicaoId) {
-      const { error } = await sb.from("projetos").update(linha).eq("id", edicaoId);
+      const { data, error } = await sb
+        .from("projetos")
+        .update(linha)
+        .eq("id", edicaoId)
+        .select("id")
+        .maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("O banco não confirmou a atualização do projeto. Recarregue a página e tente novamente.");
 
       // apaga do Storage as mídias que existiam antes e não estão mais na versão nova
       if (projetoAntigo) {
@@ -804,15 +822,22 @@ async function salvarProjeto(e) {
         }
       }
     } else {
-      const { error } = await sb.from("projetos").insert(linha);
+      const { data, error } = await sb
+        .from("projetos")
+        .insert(linha)
+        .select("id")
+        .single();
       if (error) throw error;
+      if (!data?.id) throw new Error("O banco não confirmou a gravação do projeto.");
     }
 
     fecharFormulario();
     await carregarERenderizar();
   } catch (erro) {
     console.error("Erro ao salvar projeto:", erro);
-    mostrarErroVideo("Não foi possível salvar o projeto. Verifique sua internet e tente novamente.");
+    const mensagemErro = [erro.message, erro.details, erro.hint].filter(Boolean).join(" — ");
+    erroSalvar.textContent = `Não foi possível salvar: ${mensagemErro || "erro inesperado no servidor"}`;
+    erroSalvar.hidden = false;
   } finally {
     btnSalvarProjeto.disabled = false;
     btnSalvarProjeto.textContent = textoOriginalBotao;
